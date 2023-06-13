@@ -1,0 +1,37 @@
+{
+  "license": "MIT",
+  "scripts": {
+    "test": "npm run eslint && npm run abaplint",
+    "merge": "abapmerge -f src/zabapgit.prog.abap -c zabapgit_standalone -o zabapgit.abap",
+    "merge.ci": "cp zabapgit.abap ci/zabapgit_standalone.prog.abap && cd ci && abaplint --format codeframe && cd ..",
+    "build": "rm -rf output && abap_transpile test/abap_transpile.json",
+    "unit": "npm run build && echo RUNNING && node output/index.mjs",
+    "coverage": "npm run unit && c8 node output/index.mjs && c8 report --reporter=html",
+    "integration": "rm -rf output && cp test/abap_transpile.json test/abap_transpile_int.json && sed -i 's/zcl_abapgit_auth/zcl_abapgit_integration_git/g' test/abap_transpile_int.json && abap_transpile test/abap_transpile_int.json && echo RUNNING && node output/index.mjs",
+    "abaplint": "abaplint --format codeframe",
+    "eslint": "eslint src",
+    "docker-build": "docker-compose -f test/docker-compose.yml build",
+    "docker-up": "docker-compose -f test/docker-compose.yml up",
+    "docker-unit": "docker-compose -f test/docker-compose.yml run --workdir=\"/home/node/abapGit\" abapgit npm run-script unit",
+    "docker-down": "docker-compose -f test/docker-compose.yml down"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/abapGit/abapGit.git"
+  },
+  "c8": {
+    "all": true,
+    "src": [
+      "src"
+    ]
+  },
+  "devDependencies": {
+    "@abaplint/cli": "^2.101.6",
+    "@abaplint/database-sqlite": "^2.7.6",
+    "@abaplint/runtime": "^2.7.12",
+    "@abaplint/transpiler-cli": "^2.7.12",
+    "abapmerge": "^0.15.0",
+    "c8": "^7.13.0",
+    "eslint": "^8.41.0"
+  }
+}
